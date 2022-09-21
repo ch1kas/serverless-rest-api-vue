@@ -1,0 +1,58 @@
+service: visitor-crud
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:*
+      Resource:
+        - arn:aws:dynamodb:us-east-1:331166522395:table/VisitorTable
+
+functions:
+  addVisitor:
+    handler: src/addVisitor.handler
+    events:
+      - httpApi:
+          path: /addVisitor
+          method: post
+  getAllVisitors:
+    handler: src/getAllVisitors.handler
+    events:
+      - httpApi:
+          path: /visitors
+          method: get
+  getVisitor:
+    handler: src/getVisitor.handler
+    events:
+      - httpApi:
+          path: /visitor/{id}
+          method: get
+  updateVisitor:
+    handler: src/updateVisitor.handler
+    events:
+      - httpApi:
+          path: /visitor/{id}
+          method: put
+  removeVisitor:
+    handler: src/removeVisitor.handler
+    events:
+      - httpApi:
+          path: /visitor/{id}
+          method: delete
+
+resources:
+  Resources:
+    VisitorTable:
+      Type: AWS::DynamoDB::Table
+      Properties: 
+        TableName: VisitorTable
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
